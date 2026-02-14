@@ -33,8 +33,9 @@ namespace POOGProyecto
                 this.id = id;
                 this.descripcion = descripcion;
                 estado = "Pendiente";
-            }
-            public void Mostrar()
+
+        }
+        public void Mostrar()
             {
                 Console.WriteLine("Id: " + id);
                 Console.WriteLine("Descripcion: " + descripcion);

@@ -6,24 +6,48 @@ using System.Threading.Tasks;
 
 namespace POOGProyecto
 {
-        internal class SolicitudSoporte : Reclamo
+        internal class SoliSoporte : Reclamo
         {
-            private string tecnico;
+            private string usuario;
 
-            public string Tecnico
+            public string Usuario
             {
-                get { return tecnico; }
-                set { tecnico = value; }
+                get { return usuario; }
+                set { usuario = value; }
             }
 
-            public SolicitudSoporte(int id, string descripcion, string tecnico) : base(id, descripcion)
-            {
-                this.tecnico = tecnico;
-            }
-            public void MostrarSoporte()
-            {
+        public SoliSoporte(int id, string descripcion, string usuario) : base(id, descripcion)
+        {
+            this.usuario = usuario;
+        }
+
+        public void MostrarSoporte()
+        {
                 Mostrar();
-                Console.WriteLine("Tecnico: " + tecnico);
+            Console.WriteLine("Usuario: " + usuario);
+        }
+        public bool ErrorV(string tipo)
+        {
+            string[] tiposPermitidos = { "Conexion", "InicioSesion", "Rendimiento", "Otro" };
+            return tiposPermitidos.Contains(tipo);
+        }
+
+        public string ObtenerTipoErrorPorOpcion(int opcion)
+        {
+            switch (opcion)
+            {
+                case 1:
+                    return "Conexion";
+                case 2:
+                    return "InicioSesion";
+                case 3:
+                    return "Rendimiento";
+                case 4:
+                    return "Otro";
+                default:
+                    return "Invalido";
             }
         }
+
+    }
 }
