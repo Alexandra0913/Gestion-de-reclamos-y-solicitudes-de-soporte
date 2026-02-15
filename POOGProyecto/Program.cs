@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace POOGProyecto
 {
@@ -12,48 +13,41 @@ namespace POOGProyecto
         {
             List<Reclamo> reclamos = new List<Reclamo>();
 
-            Reclamo r1 = new Reclamo(1, "Este sistema no sirve como deberia");
-            SoliSoporte s1 = new SoliSoporte(2, "Error al iniciar sesion", "Danilo");
+            CargarArchivo(reclamos);
 
-            Reclamo r2 = new Reclamo(3, "Es demasiado lento");
-            SoliSoporte s2 = new SoliSoporte(4, "Error de conexion", "Danilo");
-
-            reclamos.Add(r1);
-            reclamos.Add(s1);
-            reclamos.Add(r2);
-            reclamos.Add(s2);
-
-            Console.WriteLine("\n ------- Registros de nuevos reclamos -------");
+            Console.WriteLine("\n----- Registros de nuevos reclamos -----");
             Console.Write("Ingrese el ID del reclamo que necesita buscar: ");
 
-            int idBuscar;
-            while (!int.TryParse(Console.ReadLine(), out idBuscar))
+            int idBuscar = int.Parse(Console.ReadLine());
+
+            bool encontrado = false;
+
+            foreach (Reclamo rc in reclamos)
             {
-                Console.Write("El ID es invalido, Porfavor intentelo de nuevo: ");
-            }
-
-            Reclamo encontrado = reclamos.Find(r => r.Id == idBuscar);
-
-            if (encontrado != null)
-            {
-                Console.WriteLine("\nReclamo encontrado:\n");
-
-                if (encontrado is SoliSoporte)
+                if (rc.Id == idBuscar)
                 {
-                    ((SoliSoporte)encontrado).MostrarSoporte();
-                }
-                else
-                {
-                    encontrado.Mostrar();
+                    Console.WriteLine("\nReclamo encontrado:\n");
+
+                    if (rc is SoliSoporte)
+                    {
+                        ((SoliSoporte)rc).MostrarSoporte();
+                    }
+                    else
+                    {
+                        rc.Mostrar();
+                    }
+
+                    encontrado = true;
+                    break;
                 }
             }
-            else
+
+            if (!encontrado)
             {
-                Console.WriteLine("\nNo se encontró ningún reclamo con ese ID.");
+                Console.WriteLine("\nNo se encontro ningun reclamo con el ID indicado");
             }
 
-
-            Console.WriteLine("Ingrese su nombre:");
+            Console.WriteLine("\nIngrese su nombre porfavor:");
             string nombre = Console.ReadLine();
 
             Console.WriteLine("Seleccione el tipo de error:");
@@ -69,7 +63,8 @@ namespace POOGProyecto
 
             string descripcion = "Error de " + tipo;
 
-            SoliSoporte s = new SoliSoporte(5, descripcion, nombre);
+            int nuevoId = reclamos.Count + 1;
+            SoliSoporte s = new SoliSoporte(nuevoId, descripcion, nombre);
             reclamos.Add(s);
 
             Console.WriteLine();
@@ -81,8 +76,7 @@ namespace POOGProyecto
             {
                 if (r is SoliSoporte)
                 {
-                    SoliSoporte sl = (SoliSoporte)r;
-                    sl.MostrarSoporte();
+                    ((SoliSoporte)r).MostrarSoporte();
                 }
                 else
                 {
@@ -91,7 +85,60 @@ namespace POOGProyecto
                 Console.WriteLine();
             }
 
+            GuardarArchivo(reclamos);
+
             Console.ReadKey();
         }
+
+        static void GuardarArchivo(List<Reclamo> reclamos)
+        {
+            StreamWriter sw = new StreamWriter("reclamos.txt");
+
+            foreach (Reclamo r in reclamos)
+            {
+                if (r is SoliSoporte)
+                {
+                    SoliSoporte s = (SoliSoporte)r;
+                    sw.WriteLine("S," + s.Id + "," + s.Descripcion + "," + s.Estado + "," + s.Usuario);
+                }
+                else
+                {
+                    sw.WriteLine("R," + r.Id + "," + r.Descripcion + "," + r.Estado);
+                }
+            }
+            sw.Close();
+        }
+        static void CargarArchivo(List<Reclamo> reclamos)
+        {
+            StreamReader sr = new StreamReader("reclamos.txt");
+
+            string tipo = sr.ReadLine();
+
+            while (tipo != "")
+            {
+                int id = int.Parse(sr.ReadLine());
+                string descripcion = sr.ReadLine();
+                string estado = sr.ReadLine();
+
+                if (tipo == "R")
+                {
+                    Reclamo r = new Reclamo(id, descripcion);
+                    r.Estado = estado;
+                    reclamos.Add(r);
+                }
+
+                if (tipo == "S")
+                {
+                    string usuario = sr.ReadLine();
+                    SoliSoporte s = new SoliSoporte(id, descripcion, usuario);
+                    s.Estado = estado;
+                    reclamos.Add(s);
+                }
+
+                tipo = sr.ReadLine();
+            }
+            sr.Close();
+        }
+
     }
 }

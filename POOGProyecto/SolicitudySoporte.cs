@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 
 namespace POOGProyecto
 {
-        internal class SoliSoporte : Reclamo
-        {
-            private string usuario;
+    internal class SoliSoporte : Reclamo
+    {
+        private string usuario;
 
-            public string Usuario
-            {
-                get { return usuario; }
-                set { usuario = value; }
-            }
+        public string Usuario
+        {
+            get { return usuario; }
+            set { usuario = value; }
+        }
 
         public SoliSoporte(int id, string descripcion, string usuario) : base(id, descripcion)
         {
@@ -23,7 +23,7 @@ namespace POOGProyecto
 
         public void MostrarSoporte()
         {
-                Mostrar();
+            Mostrar();
             Console.WriteLine("Usuario: " + usuario);
         }
         public bool ErrorV(string tipo)
@@ -31,10 +31,9 @@ namespace POOGProyecto
             string[] tiposPermitidos = { "Conexion", "InicioSesion", "Rendimiento", "Otro" };
             return tiposPermitidos.Contains(tipo);
         }
-
-        public string ObtenerTipoErrorPorOpcion(int opcion)
+        public string ObtenerTipoErrorPorOpcion(int opciones)
         {
-            switch (opcion)
+            switch (opciones)
             {
                 case 1:
                     return "Conexion";
