@@ -23,6 +23,35 @@ namespace POOGProyecto
             reclamos.Add(r2);
             reclamos.Add(s2);
 
+            Console.WriteLine("\n ------- Registros de nuevos reclamos -------");
+            Console.Write("Ingrese el ID del reclamo que necesita buscar: ");
+
+            int idBuscar;
+            while (!int.TryParse(Console.ReadLine(), out idBuscar))
+            {
+                Console.Write("El ID es invalido, Porfavor intentelo de nuevo: ");
+            }
+
+            Reclamo encontrado = reclamos.Find(r => r.Id == idBuscar);
+
+            if (encontrado != null)
+            {
+                Console.WriteLine("\nReclamo encontrado:\n");
+
+                if (encontrado is SoliSoporte)
+                {
+                    ((SoliSoporte)encontrado).MostrarSoporte();
+                }
+                else
+                {
+                    encontrado.Mostrar();
+                }
+            }
+            else
+            {
+                Console.WriteLine("\nNo se encontró ningún reclamo con ese ID.");
+            }
+
 
             Console.WriteLine("Ingrese su nombre:");
             string nombre = Console.ReadLine();
@@ -44,6 +73,7 @@ namespace POOGProyecto
             reclamos.Add(s);
 
             Console.WriteLine();
+            Console.WriteLine("----------------------------");
             Console.WriteLine("Lista registrada de reclamos");
             Console.WriteLine("----------------------------");
 
