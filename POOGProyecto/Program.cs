@@ -15,10 +15,32 @@ namespace POOGProyecto
 
             CargarArchivo(reclamos);
 
-            Console.WriteLine("\n----- Registros de nuevos reclamos -----");
+            Console.WriteLine("-¡- Registros de nuevos reclamos -¡-");
             Console.Write("Ingrese el ID del reclamo que necesita buscar: ");
 
-            int idBuscar = int.Parse(Console.ReadLine());
+            int idBuscar = 0;
+            bool valido = false;
+
+            while (!valido)
+            {
+                try
+                {
+                    idBuscar = int.Parse(Console.ReadLine());
+
+                    if (idBuscar > 0)
+                    {
+                        valido = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("El numero que ingrese tiene que ser mayor que 0:");
+                    }
+                }
+                catch
+                {
+                    Console.WriteLine("Porfavor ingrese un numero valido:");
+                }
+            }
 
             bool encontrado = false;
 
@@ -26,11 +48,11 @@ namespace POOGProyecto
             {
                 if (rc.Id == idBuscar)
                 {
-                    Console.WriteLine("\nReclamo encontrado:\n");
+                    Console.WriteLine("El reclamo ha sido encontrado:");
 
-                    if (rc is SoliSoporte)
+                    if (rc is SolicitudSoporte)
                     {
-                        ((SoliSoporte)rc).MostrarSoporte();
+                        ((SolicitudSoporte)rc).MostrarSoporte();
                     }
                     else
                     {
@@ -47,8 +69,13 @@ namespace POOGProyecto
                 Console.WriteLine("\nNo se encontro ningun reclamo con el ID indicado");
             }
 
-            Console.WriteLine("\nIngrese su nombre porfavor:");
-            string nombre = Console.ReadLine();
+            string nombre = "";
+
+            while (nombre == "")
+            {
+                Console.WriteLine("\nIngrese su nombre por favor:");
+                nombre = Console.ReadLine();
+            }
 
             Console.WriteLine("Seleccione el tipo de error:");
             Console.WriteLine("1 - Conexion");
@@ -56,27 +83,48 @@ namespace POOGProyecto
             Console.WriteLine("3 - Rendimiento");
             Console.WriteLine("4 - Otro");
 
-            int opcion = int.Parse(Console.ReadLine());
+            int opcion = 0;
+            bool opcionValida = false;
 
-            SoliSoporte temp = new SoliSoporte(0, "", "");
-            string tipo = temp.ObtenerTipoErrorPorOpcion(opcion);
+            while (!opcionValida)
+            {
+                try
+                {
+                    opcion = int.Parse(Console.ReadLine());
+
+                    if (opcion >= 1 && opcion <= 4)
+                    {
+                        opcionValida = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Seleciona una de las opciones entre 1 y 4:");
+                    }
+                }
+                catch
+                {
+                    Console.WriteLine("Ingrese un numero valido:");
+                }
+            }
+
+            string tipo = SolicitudSoporte.ObtenerTipoErrorPorOpcion(opcion);
 
             string descripcion = "Error de " + tipo;
 
             int nuevoId = reclamos.Count + 1;
-            SoliSoporte s = new SoliSoporte(nuevoId, descripcion, nombre);
+            SolicitudSoporte s = new SolicitudSoporte(nuevoId, descripcion, nombre);
             reclamos.Add(s);
 
             Console.WriteLine();
-            Console.WriteLine("----------------------------");
+            Console.WriteLine("--=--=--=--=--=--=--=--=--=--=--=--=--=--");
             Console.WriteLine("Lista registrada de reclamos");
-            Console.WriteLine("----------------------------");
+            Console.WriteLine("--=--=--=--=--=--=--=--=--=--=--=--=--=--");
 
             foreach (Reclamo r in reclamos)
             {
-                if (r is SoliSoporte)
+                if (r is SolicitudSoporte)
                 {
-                    ((SoliSoporte)r).MostrarSoporte();
+                    ((SolicitudSoporte)r).MostrarSoporte();
                 }
                 else
                 {
@@ -92,53 +140,59 @@ namespace POOGProyecto
 
         static void GuardarArchivo(List<Reclamo> reclamos)
         {
-            StreamWriter sw = new StreamWriter("reclamos.txt");
-
-            foreach (Reclamo r in reclamos)
+            using (StreamWriter sw = new StreamWriter("reclamos.txt"))
             {
-                if (r is SoliSoporte)
+                foreach (Reclamo r in reclamos)
                 {
-                    SoliSoporte s = (SoliSoporte)r;
-                    sw.WriteLine("S," + s.Id + "," + s.Descripcion + "," + s.Estado + "," + s.Usuario);
-                }
-                else
-                {
-                    sw.WriteLine("R," + r.Id + "," + r.Descripcion + "," + r.Estado);
+                    if (r is SolicitudSoporte s)
+                    {
+                        sw.WriteLine("S");
+                        sw.WriteLine(s.Id);
+                        sw.WriteLine(s.Descripcion);
+                        sw.WriteLine(s.Estado);
+                        sw.WriteLine(s.Usuario);
+                    }
+                    else
+                    {
+                        sw.WriteLine("R");
+                        sw.WriteLine(r.Id);
+                        sw.WriteLine(r.Descripcion);
+                        sw.WriteLine(r.Estado);
+                    }
                 }
             }
-            sw.Close();
         }
+
         static void CargarArchivo(List<Reclamo> reclamos)
         {
-            StreamReader sr = new StreamReader("reclamos.txt");
+            if (!File.Exists("reclamos.txt"))
+                return;
 
-            string tipo = sr.ReadLine();
-
-            while (tipo != "")
+            using (StreamReader sr = new StreamReader("reclamos.txt"))
             {
-                int id = int.Parse(sr.ReadLine());
-                string descripcion = sr.ReadLine();
-                string estado = sr.ReadLine();
+                string tipo;
 
-                if (tipo == "R")
+                while ((tipo = sr.ReadLine()) != null)
                 {
-                    Reclamo r = new Reclamo(id, descripcion);
-                    r.Estado = estado;
-                    reclamos.Add(r);
-                }
+                    int id = int.Parse(sr.ReadLine());
+                    string descripcion = sr.ReadLine();
+                    string estado = sr.ReadLine();
 
-                if (tipo == "S")
-                {
-                    string usuario = sr.ReadLine();
-                    SoliSoporte s = new SoliSoporte(id, descripcion, usuario);
-                    s.Estado = estado;
-                    reclamos.Add(s);
+                    if (tipo == "R")
+                    {
+                        Reclamo r = new Reclamo(id, descripcion);
+                        r.Estado = estado;
+                        reclamos.Add(r);
+                    }
+                    else if (tipo == "S")
+                    {
+                        string usuario = sr.ReadLine();
+                        SolicitudSoporte s = new SolicitudSoporte(id, descripcion, usuario);
+                        s.Estado = estado;
+                        reclamos.Add(s);
+                    }
                 }
-
-                tipo = sr.ReadLine();
             }
-            sr.Close();
         }
-
     }
 }
